@@ -89,7 +89,9 @@ class SageMakerClient(LLMClient):
         most_recent_received_token_time = time.monotonic()
         
         endpoint_name = os.environ.get("AWS_SAGEMAKER_EP_NAME") or model
-        message_invoke = 
+
+        print(f"Using endpoint name: {endpoint_name}")
+        print(f"Using sample msg: {set_message}")
         try:
             response = sm_runtime.invoke_endpoint_with_response_stream(
                 EndpointName=endpoint_name,
