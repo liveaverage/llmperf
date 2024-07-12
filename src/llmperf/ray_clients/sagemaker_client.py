@@ -62,6 +62,19 @@ class SageMakerClient(LLMClient):
             },
         }
 
+        message_openai = {
+            "model": model,
+            "messages": [
+                [
+                    {"role": "system", "content": ""},
+                    {"role": "user", "content": prompt},
+                ]
+            ],
+            **request_config.sampling_params,
+        }
+        
+        set_message = message_openai if os.environ.get("AWS_SAGEMAKER_OPENAI_COMPAT") == '1' else message
+
         time_to_next_token = []
         tokens_received = 0
         ttft = 0
@@ -74,12 +87,14 @@ class SageMakerClient(LLMClient):
 
         start_time = time.monotonic()
         most_recent_received_token_time = time.monotonic()
-
+        
+        endpoint_name = os.environ.get("AWS_SAGEMAKER_EP_NAME") or model
+        message_invoke = 
         try:
             response = sm_runtime.invoke_endpoint_with_response_stream(
-                EndpointName=model,
+                EndpointName=endpoint_name,
                 ContentType="application/json",
-                Body=json.dumps(message),
+                Body=json.dumps(set_message),
                 CustomAttributes="accept_eula=true",
             )
 
